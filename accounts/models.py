@@ -10,7 +10,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     STATUS_REJECTED = 'rejected'
 
     username = models.CharField(max_length=100, unique=False)  # username 필드
-    oid = models.IntegerField(null=False, unique=True)  # 카카오 user_id
+    oid = models.IntegerField(null=True, unique=True, blank=False)  # 카카오 user_id
     # 추가 필드들
     position = models.CharField(max_length=100, blank=True)
     directNumber = models.IntegerField(null=True, blank=True)

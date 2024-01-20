@@ -1,3 +1,5 @@
+from django.db import transaction
+
 import requests
 from django.shortcuts import redirect
 from django.conf import settings
@@ -55,7 +57,6 @@ def kakao_callback(request):
         "https://kapi.kakao.com/v2/user/me", headers={"Authorization": f"Bearer {access_token}"}
     )
     profile_json = profile_request.json()
-    print(profile_json)
 
     user_oid = profile_json.get('id')
     kakao_account = profile_json.get('kakao_account')
@@ -67,6 +68,7 @@ def kakao_callback(request):
     """
     try:
         user = CustomUser.objects.get(oid=user_oid)
+
         #user가 존재할 때 아래 데이터 반환
 
         response_data = {
@@ -85,19 +87,31 @@ def kakao_callback(request):
     except CustomUser.DoesNotExist:
         print("유저가 존재하지 않은 경우")
         # 기존에 가입된 유저가 없으면 새로 가입
-
-        data = {'access_token': access_token, 'code': code}
+        print(access_token)
+        print(code)
+        data = {'access_token': access_token, 'code': code, 'id_token': user_oid}
 
         accept = requests.post(
             f"{BASE_URL}accounts/kakao/login/finish/",
-            data=data
+            data=data,
         )
+
+        print(accept.reason)
 
         accept_status = accept.status_code
 
         if accept_status != 200:
             return JsonResponse({'err_msg': 'failed to signup'}, status=accept_status)
 
+        # with transaction.atomic():
+        #     user = CustomUser.objects.create(
+        #         oid=user_oid,
+        #         username=nickname,
+        #         profileImage=profile_image_url,
+        #         position=None,
+        #         directNumber=None,
+        #         status='Pending'
+        #     )
 
         # user의 oid, username, profileImage와 Access Token, Refresh token 가져옴
         response_data = {

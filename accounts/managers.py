@@ -7,6 +7,7 @@ class CustomUserManager(BaseUserManager):
         if not oid:
             raise ValueError(_('카카오 로그인을 통해서 로그인 해주세요.'))
         user = self.model(oid=oid, **extra_fields)
+        user.set_password(extra_fields.get('password'))
         user.save(using=self._db)
         return user
 
@@ -19,4 +20,5 @@ class CustomUserManager(BaseUserManager):
             raise ValueError(_('Superuser must have is_staff=True.'))
         if extra_fields.get('is_superuser') is not True:
             raise ValueError(_('Superuser must have is_superuser=True.'))
+        print(oid, type(oid))
         return self.create_user(oid, **extra_fields)
