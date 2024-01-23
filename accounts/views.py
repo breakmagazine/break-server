@@ -87,8 +87,6 @@ def kakao_callback(request):
     except CustomUser.DoesNotExist:
         print("유저가 존재하지 않은 경우")
         # 기존에 가입된 유저가 없으면 새로 가입
-        print(access_token)
-        print(code)
         data = {'access_token': access_token, 'code': code, 'id_token': user_oid}
 
         accept = requests.post(
@@ -96,22 +94,22 @@ def kakao_callback(request):
             data=data,
         )
 
-        print(accept.reason)
-
         accept_status = accept.status_code
 
         if accept_status != 200:
             return JsonResponse({'err_msg': 'failed to signup'}, status=accept_status)
 
-        # with transaction.atomic():
-        #     user = CustomUser.objects.create(
-        #         oid=user_oid,
-        #         username=nickname,
-        #         profileImage=profile_image_url,
-        #         position=None,
-        #         directNumber=None,
-        #         status='Pending'
-        #     )
+        print(user_oid)
+        with transaction.atomic():
+            user = CustomUser.objects.create(
+                oid=user_oid,
+                username=nickname,
+                profileImage=profile_image_url,
+                position=None,
+                directNumber=None,
+                status='Pending'
+            )
+            print(user)
 
         # user의 oid, username, profileImage와 Access Token, Refresh token 가져옴
         response_data = {
