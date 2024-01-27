@@ -19,21 +19,5 @@ class CustomKakaoOAuth2Adapter(OAuth2Adapter):
         resp = requests.get(self.profile_url, headers=headers)
         resp.raise_for_status()
         extra_data = resp.json()
-        # print(extra_data)
-        user_oid = extra_data.get('id')
-        profile_image = extra_data.get('properties', {}).get('profile_image')
 
         return self.get_provider().sociallogin_from_response(request, extra_data)
-
-class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
-    def save_user(self, request, sociallogin, form=None):
-        user = super(CustomSocialAccountAdapter, self).save_user(request, sociallogin, form)
-        print(sociallogin)
-
-        # user.oid = sociallogin.account.extra_data.get('id')
-        # user.profileImage = sociallogin.account.extra_data.get('properties', {}).get('profile_image')
-        # print(user.profileImage)
-        # print("save_user called")
-        # user.save()
-        #
-        # return user
