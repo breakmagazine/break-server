@@ -14,6 +14,7 @@ from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from breakserver.settings import secrets
 from .adapter import CustomKakaoOAuth2Adapter
 from .models import CustomUser
+from .serializers import CustomUserSerializer
 
 BASE_URL = 'http://127.0.0.1:8000/'
 KAKAO_CALLBACK_URI = BASE_URL + 'accounts/kakao/callback/'
@@ -70,23 +71,15 @@ def kakao_callback(request):
         # Signup or Signin Request
         try:
             user = CustomUser.objects.get(oid=user_oid)
-
-            #user가 존재할 때 아래 데이터 반환
-            response_data = {
-                'user_id': user.oid,
-                'username': user.username,
-                'profile_image': user.profileImage,
-                'position': user.position,
-                'directNumber': user.directNumber,
-                'status': user.status,
+            serializer = CustomUserSerializer(user)
+            response_data = serializer.data
+            response_data.update({
                 'access_token': access_token,
                 'refresh_token': refresh_token
-            }
-
+            })
             return Response(response_data)
 
         except CustomUser.DoesNotExist:
-            print("유저가 존재하지 않은 경우")
             # 기존에 가입된 유저가 없으면 새로 가입
             data = {'access_token': access_token, 'code': code, 'id_token': user_oid}
 
@@ -96,11 +89,9 @@ def kakao_callback(request):
             )
 
             accept_status = accept.status_code
-
             if accept_status != 200:
                 return Response({'err_msg': 'failed to signup'}, status=accept_status)
 
-            print(user_oid)
             with transaction.atomic():
                 user = CustomUser.objects.create(
                     oid=user_oid,
@@ -110,19 +101,13 @@ def kakao_callback(request):
                     directNumber=None,
                     status='Pending'
                 )
-                print(user)
 
-            # user의 oid, username, profileImage와 Access Token, Refresh token 가져옴
-            response_data = {
-                'user_id': user_oid,
-                'username': nickname,
-                'profile_image': profile_image_url,
-                'position': None,
-                'directNumber': None,
-                'status': 'Pending',
+            serializer = CustomUserSerializer(user)
+            response_data = serializer.data
+            response_data.update({
                 'access_token': access_token,
                 'refresh_token': refresh_token
-            }
+            })
 
             return Response(response_data)
 

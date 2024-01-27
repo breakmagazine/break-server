@@ -3,6 +3,12 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from dj_rest_auth.registration.serializers import (
     RegisterSerializer as DefaultRegisterSerializer,
 )
+from .models import CustomUser
+
+class CustomUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['oid', 'username', 'profileImage', 'position', 'directNumber', 'status']
 
 
 class CustomTokenRefreshSerializer(serializers.Serializer):
