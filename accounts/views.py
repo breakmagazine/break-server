@@ -1,12 +1,13 @@
 from django.db import transaction
+from drf_spectacular.utils import extend_schema, OpenApiResponse
 
 import requests
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.conf import settings
 from json.decoder import JSONDecodeError
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from dj_rest_auth.registration.views import SocialLoginView
@@ -23,29 +24,36 @@ REST_API_KEY = getattr(settings, 'KAKAO_REST_API_KEY')
 CLIENT_SECRET = secrets['SECRET_KEY']
 
 # Kakao API 요청 함수
+def get_kakao_token(code):
+    try:
+        response = requests.get(
+            f"https://kauth.kakao.com/oauth/token?grant_type=authorization_code&client_id={REST_API_KEY}&client_secret={CLIENT_SECRET}&redirect_uri={KAKAO_CALLBACK_URI}&code={code}"
+        )
+        response.raise_for_status()
+        return response.json()
+    except requests.RequestException as e:
+        raise e
+
+
+# Kakao 프로필 정보 요청 함수
+def get_kakao_profile(access_token):
+    try:
+        response = requests.get(
+            "https://kapi.kakao.com/v2/user/me",
+            headers={"Authorization": f"Bearer {access_token}"}
+        )
+        response.raise_for_status()
+        return response.json()
+    except requests.RequestException as e:
+        raise e
+
 class SocialLoginView(APIView):
-    def get_kakao_token(code):
-        try:
-            response = requests.get(
-                f"https://kauth.kakao.com/oauth/token?grant_type=authorization_code&client_id={REST_API_KEY}&client_secret={CLIENT_SECRET}&redirect_uri={KAKAO_CALLBACK_URI}&code={code}"
-            )
-            response.raise_for_status()
-            return response.json()
-        except requests.RequestException as e:
-            raise e
 
-    # Kakao 프로필 정보 요청 함수
-    def get_kakao_profile(access_token):
-        try:
-            response = requests.get(
-                "https://kapi.kakao.com/v2/user/me",
-                headers={"Authorization": f"Bearer {access_token}"}
-            )
-            response.raise_for_status()
-            return response.json()
-        except requests.RequestException as e:
-            raise e
-
+    @extend_schema(
+        summary="카카오 로그인",
+        description="카카오 로그인 페이지로 리다이렉트합니다.",
+        responses={302: OpenApiResponse(description="Redirects to the Kakao login page.", response=None)}
+    )
     @api_view(['GET'])
     @permission_classes([AllowAny])
     def kakao_login(request):
@@ -53,6 +61,7 @@ class SocialLoginView(APIView):
             f"https://kauth.kakao.com/oauth/authorize?client_id={REST_API_KEY}&redirect_uri={KAKAO_CALLBACK_URI}&response_type=code"
         )
 
+    @extend_schema(exclude=True)
     @api_view(['GET'])
     @permission_classes([AllowAny])
     def kakao_callback(request):
@@ -120,3 +129,32 @@ class KakaoLogin(SocialLoginView):
     adapter_class = CustomKakaoOAuth2Adapter
     client_class = OAuth2Client
     callback_url = KAKAO_CALLBACK_URI
+
+class UpdateUserInfoView(APIView):
+    permission_classes = [IsAuthenticated]  # 인증된 사용자만 접근 가능하도록 설정
+
+    @extend_schema(request=CustomUserSerializer, responses={200: CustomUserSerializer})
+    def put(self, request, *args, **kwargs):
+        user = request.user
+
+
+        # 유저 데이터 가져옴
+        nickname = request.data.get('nickname')
+        profile_image = request.data.get('profileImage')
+        position = request.data.get('position')
+        direct_number = request.data.get('directNumber')
+        status = request.data.get('status')
+
+        # 유저 데이터 비교
+        user.username = nickname if nickname is not None else user.username
+        user.profileImage = profile_image if profile_image is not None else user.profileImage
+        user.position = position if position is not None else user.position
+        user.directNumber = direct_number if direct_number is not None else user.directNumber
+        user.status = status if status is not None else user.status
+        user.save()
+
+        # 업데이트된 사용자 정보를 반환
+        serializer = CustomUserSerializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
