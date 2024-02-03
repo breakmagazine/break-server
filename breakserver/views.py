@@ -1,7 +1,9 @@
 from django.shortcuts import render
 
+
 def kakao_login_page(request):
-    return render(request, 'home.html')
+    return render(request, "home.html")
+
 
 from rest_framework.request import Request
 from rest_framework.response import Response

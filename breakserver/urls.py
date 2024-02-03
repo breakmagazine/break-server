@@ -5,12 +5,16 @@ from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from rest_framework import permissions
 from accounts.urls import urlpatterns as accounts_urlpatterns
-from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
+from drf_spectacular.views import (
+    SpectacularAPIView,
+    SpectacularRedocView,
+    SpectacularSwaggerView,
+)
 
 schema_view = get_schema_view(
     openapi.Info(
         title="Break-Magazine API",
-        default_version='v1',
+        default_version="v1",
         description="API documentation for Break-Magazine Webzine project",
     ),
     public=True,
@@ -18,21 +22,38 @@ schema_view = get_schema_view(
     permission_classes=[permissions.AllowAny],
 )
 
+
+def preprocessing_filter_spec(endpoints):
+    filtered = []
+    for path, path_regex, method, callback in endpoints:
+        # Remove all but DRF API endpoints
+        if not path.startswith("/registration/"):
+            filtered.append((path, path_regex, method, callback))
+    return filtered
+
+
 urlpatterns = [
-    path('', kakao_login_page, name='home'),
-    path('admin/', admin.site.urls),
-    path("sign-up", UserRegisterAPIView.as_view(), name="user-sign-up"),
-    path("sign-in", UserLoginAPIView.as_view(), name="user-sign-in"),
-
+    path("", kakao_login_page, name="home"),
+    path("admin/", admin.site.urls),
     # 로그인 관련
-    path('accounts/', include('dj_rest_auth.urls')),
-    path('accounts/', include('dj_rest_auth.registration.urls')),
-    path('allauth/', include('allauth.urls')),
-    path('accounts/', include('accounts.urls')),
-    path('accounts/social/', include('allauth.socialaccount.urls'), ),
-
+    path("accounts/", include("dj_rest_auth.urls")),
+    path("accounts/", include("dj_rest_auth.registration.urls")),
+    # path('allauth/', include('allauth.urls')),
+    path("accounts/", include("accounts.urls")),
+    path(
+        "accounts/social/",
+        include("allauth.socialaccount.urls"),
+    ),
     # swagger 관련
-    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
-    path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
-    path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
+    path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
+    path(
+        "api/schema/swagger-ui/",
+        SpectacularSwaggerView.as_view(url_name="schema"),
+        name="swagger-ui",
+    ),
+    path(
+        "api/schema/redoc/",
+        SpectacularRedocView.as_view(url_name="schema"),
+        name="redoc",
+    ),
 ]

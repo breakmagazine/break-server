@@ -12,7 +12,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
-SECRET_BASE_FILE = os.path.join(BASE_DIR, 'secrets.json')
+SECRET_BASE_FILE = os.path.join(BASE_DIR, "secrets.json")
 secrets = json.loads(open(SECRET_BASE_FILE).read())
 for key, value in secrets.items():
     setattr(sys.modules[__name__], key, value)
@@ -35,24 +35,21 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.sites",
-
-    #myapp
-    'breakserver',
-    'accounts',
-
-    #django-rest-auth
-    'rest_framework',
-    'rest_framework.authtoken',
-    'rest_framework_simplejwt',
-    'dj_rest_auth',
-    'dj_rest_auth.registration',
-
-    #django-allauth
-    'allauth',
-    'allauth.account',
-    'allauth.socialaccount',
-    'allauth.socialaccount.providers.kakao',
-    'drf_spectacular',
+    # myapp
+    "breakserver",
+    "accounts",
+    # django-rest-auth
+    "rest_framework",
+    "rest_framework_simplejwt",
+    "rest_framework.authtoken",
+    "dj_rest_auth",
+    "dj_rest_auth.registration",
+    # django-allauth
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "allauth.socialaccount.providers.kakao",
+    "drf_spectacular",
 ]
 
 MIDDLEWARE = [
@@ -63,28 +60,38 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    'allauth.account.middleware.AccountMiddleware',
+    "allauth.account.middleware.AccountMiddleware",
     # 'corsheaders.middleware.CorsMiddleWare',
 ]
 
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None  # 커스텀한 user model엔 name field가 있다.
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_AUTHENTICATION_METHOD = "email"
+ACCOUNT_EMAIL_VERIFICATION = "none"
+
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.AllowAny',
+    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.AllowAny",),
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',  # JWT 인증 클래스로 변경
-    ),
-    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
+# REST_USE_JWT = True
+
 REST_AUTH = {
-    "REGISTER_SERIALIZER": "accounts.serializers.UserRegisterSerializer",
+    'USE_JWT': True,
+    'JWT_AUTH_COOKIE': 'jwt-auth',
+    "REGISTER_SERIALIZER": "accounts.serializers.UserLoginSerializer",
+    'SESSION_LOGIN': False,
 }
 
 # JWT
-REST_USE_JWT = True
 
 SIMPLE_JWT = {
-        "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
     "ROTATE_REFRESH_TOKENS": True,  # True로 설정할 경우, refresh token을 보내면 새로운 access token과 refresh token이 반환된다.
     "BLACKLIST_AFTER_ROTATION": True,  # True로 설정될 경우, 기존에 있던 refresh token은 blacklist가된다
@@ -136,7 +143,7 @@ CORS_ALLOW_HEADERS = (
 )
 
 SPECTACULAR_SETTINGS = {
-    "PREPROCESSING_HOOKS": ["accounts.urls.preprocessing_filter_spec"],
+    "PREPROCESSING_HOOKS": ["breakserver.urls.preprocessing_filter_spec"],
     "COMPONENTS": {
         "securitySchemes": {
             "BearerAuth": {
@@ -146,11 +153,7 @@ SPECTACULAR_SETTINGS = {
             }
         }
     },
-    "SECURITY": [
-        {
-            "BearerAuth": []
-        }
-    ],
+    "SECURITY": [{"BearerAuth": []}],
 }
 
 ROOT_URLCONF = "breakserver.urls"
@@ -197,10 +200,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-AUTH_USER_MODEL = 'accounts.CustomUser'
+AUTH_USER_MODEL = "accounts.CustomUser"
 
 SITE_ID = 2
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 
 # Internationalization
