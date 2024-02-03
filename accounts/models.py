@@ -28,6 +28,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     )
 
     is_staff = models.BooleanField(default=False)  # 슈퍼유저 권한
+    is_superuser = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)  # 계정 활성화 상태
     created_at = models.DateTimeField(auto_now_add=True)
 

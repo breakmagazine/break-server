@@ -18,7 +18,7 @@ from breakserver.settings import secrets
 from dj_rest_auth.registration.views import SocialLoginView
 from allauth.socialaccount.providers.kakao import views as kakao_view
 from .models import CustomUser
-from .serializers import CustomUserSerializer
+from .serializers import UserLoginSerializer
 
 BASE_URL = 'http://127.0.0.1:8000/'
 KAKAO_CALLBACK_URI = BASE_URL + 'accounts/kakao/callback/'
@@ -151,7 +151,7 @@ class KakaoLogin(SocialLoginView):
 class UpdateUserInfoView(APIView):
     permission_classes = [IsAuthenticated]  # 인증된 사용자만 접근 가능하도록 설정
 
-    @extend_schema(request=CustomUserSerializer, responses={200: CustomUserSerializer})
+    @extend_schema(request=UserLoginSerializer, responses={200: UserLoginSerializer})
     def put(self, request, *args, **kwargs):
         user = request.user
 
@@ -172,7 +172,7 @@ class UpdateUserInfoView(APIView):
         user.save()
 
         # 업데이트된 사용자 정보를 반환
-        serializer = CustomUserSerializer(user)
+        serializer = UserLoginSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
