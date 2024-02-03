@@ -44,6 +44,7 @@ def kakao_login(request):
         f"https://kauth.kakao.com/oauth/authorize?client_id={REST_API_KEY}&redirect_uri={KAKAO_CALLBACK_URI}&response_type=code"
     )
 
+
 @extend_schema(exclude=True)
 @api_view(["GET", "POST"])
 @permission_classes([AllowAny])
@@ -118,6 +119,7 @@ def kakao_callback(request):
         accept_json = accept.json()
         accept_json.pop("user", None)
         return Response(accept_json)
+
 
 class KakaoLoginView(SocialLoginView):
     adapter_class = kakao_view.KakaoOAuth2Adapter

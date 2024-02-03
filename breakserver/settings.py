@@ -79,13 +79,12 @@ REST_FRAMEWORK = {
     ),
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
-# REST_USE_JWT = True
 
 REST_AUTH = {
-    'USE_JWT': True,
-    'JWT_AUTH_COOKIE': 'jwt-auth',
+    "USE_JWT": True,
+    "JWT_AUTH_COOKIE": "jwt-auth",
     "REGISTER_SERIALIZER": "accounts.serializers.UserLoginSerializer",
-    'SESSION_LOGIN': False,
+    "SESSION_LOGIN": False,
 }
 
 # JWT
