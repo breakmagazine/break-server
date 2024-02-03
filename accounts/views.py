@@ -20,7 +20,7 @@ from breakserver.settings import secrets
 from dj_rest_auth.registration.views import SocialLoginView
 from allauth.socialaccount.providers.kakao import views as kakao_view
 from .models import CustomUser
-from .serializers import UserLoginSerializer
+from .serializers import UserLoginSerializer, UserInfoUpdateSerializer
 
 BASE_URL = "http://127.0.0.1:8000/"
 KAKAO_CALLBACK_URI = BASE_URL + "accounts/kakao/callback/"
@@ -133,25 +133,25 @@ class KakaoLoginView(SocialLoginView):
 class UpdateUserInfoView(APIView):
     permission_classes = [IsAuthenticated]  # 인증된 사용자만 접근 가능하도록 설정
 
-    @extend_schema(request=UserLoginSerializer, responses={200: UserLoginSerializer})
+    @extend_schema(request=UserInfoUpdateSerializer, responses={200: UserInfoUpdateSerializer})
     def put(self, request, *args, **kwargs):
         user = request.user
 
         # 유저 데이터 가져옴
-        nickname = request.data.get("nickname")
-        profile_image = request.data.get("profileImage")
+        username = request.data.get("username")
+        profile_image = request.data.get("profile_image")
         position = request.data.get("position")
-        direct_number = request.data.get("directNumber")
+        direct_number = request.data.get("direct_number")
         status = request.data.get("status")
 
         # 유저 데이터 비교
-        user.username = nickname if nickname is not None else user.username
-        user.profileImage = (
-            profile_image if profile_image is not None else user.profileImage
+        user.username = username if username is not None else user.username
+        user.profile_image = (
+            profile_image if profile_image is not None else user.profile_image
         )
         user.position = position if position is not None else user.position
-        user.directNumber = (
-            direct_number if direct_number is not None else user.directNumber
+        user.direct_number = (
+            direct_number if direct_number is not None else user.direct_number
         )
         user.status = status if status is not None else user.status
         user.save()
