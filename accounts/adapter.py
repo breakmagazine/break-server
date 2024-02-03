@@ -19,5 +19,4 @@ class CustomKakaoOAuth2Adapter(OAuth2Adapter):
         resp = requests.get(self.profile_url, headers=headers)
         resp.raise_for_status()
         extra_data = resp.json()
-
         return self.get_provider().sociallogin_from_response(request, extra_data)

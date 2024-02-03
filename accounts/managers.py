@@ -3,22 +3,16 @@ from django.contrib.auth.base_user import BaseUserManager
 from django.utils.translation import gettext_lazy as _
 
 class CustomUserManager(BaseUserManager):
-    def create_user(self, oid, **extra_fields):
-        if not oid:
-            raise ValueError(_('카카오 로그인을 통해서 로그인 해주세요.'))
-        user = self.model(oid=oid, **extra_fields)
-        user.set_password(extra_fields.get('password'))
+    def create_user(self, email, password=None, **extra_fields):
+        if not email:
+            raise ValueError("이메일 필드가 작성되어야 합니다.")
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, oid, **extra_fields):
-        extra_fields.setdefault('is_staff', True)
-        extra_fields.setdefault('is_superuser', True)
-        extra_fields.setdefault('is_active', True)
-
-        if extra_fields.get('is_staff') is not True:
-            raise ValueError(_('Superuser must have is_staff=True.'))
-        if extra_fields.get('is_superuser') is not True:
-            raise ValueError(_('Superuser must have is_superuser=True.'))
-        print(oid, type(oid))
-        return self.create_user(oid, **extra_fields)
+    def create_superuser(self, email, password=None, **extra_fields):
+        extra_fields.setdefault("is_staff", True)
+        extra_fields.setdefault("is_superuser", True)
+        return self.create_user(email, password, **extra_fields)

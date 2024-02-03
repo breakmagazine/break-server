@@ -21,11 +21,15 @@ schema_view = get_schema_view(
 urlpatterns = [
     path('', kakao_login_page, name='home'),
     path('admin/', admin.site.urls),
-    # path('accounts/', include('dj_rest_auth.urls')),
-    # path('accounts/', include('dj_rest_auth.registration.urls')),
+
+    # 로그인 관련
+    path('accounts/', include('dj_rest_auth.urls')),
+    path('accounts/', include('dj_rest_auth.registration.urls')),
     path('allauth/', include('allauth.urls')),
     path('accounts/', include('accounts.urls')),
     path('accounts/social/', include('allauth.socialaccount.urls'), ),
+
+    # swagger 관련
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),

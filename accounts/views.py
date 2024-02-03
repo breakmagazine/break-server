@@ -10,11 +10,13 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from dj_rest_auth.registration.views import SocialLoginView
+
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 
 from breakserver.settings import secrets
-from .adapter import CustomKakaoOAuth2Adapter
+
+from dj_rest_auth.registration.views import SocialLoginView
+from allauth.socialaccount.providers.kakao import views as kakao_view
 from .models import CustomUser
 from .serializers import CustomUserSerializer
 
@@ -47,7 +49,7 @@ def get_kakao_profile(access_token):
     except requests.RequestException as e:
         raise e
 
-class SocialLoginView(APIView):
+class KakaoLoginView(APIView):
 
     @extend_schema(
         summary="카카오 로그인",
@@ -62,7 +64,7 @@ class SocialLoginView(APIView):
         )
 
     @extend_schema(exclude=True)
-    @api_view(['GET'])
+    @api_view(['GET', 'POST'])
     @permission_classes([AllowAny])
     def kakao_callback(request):
         # Access Token Request
@@ -70,7 +72,6 @@ class SocialLoginView(APIView):
             code = request.GET.get("code")
             token_data = get_kakao_token(code)
             access_token = token_data.get("access_token")
-            refresh_token = token_data.get("refresh_token")
 
             # Profile Request
             profile_data = get_kakao_profile(access_token)
@@ -82,17 +83,40 @@ class SocialLoginView(APIView):
             # Signup or Signin Request
             try:
                 user = CustomUser.objects.get(oid=user_oid)
-                serializer = CustomUserSerializer(user)
-                response_data = serializer.data
-                response_data.update({
-                    'access_token': access_token,
-                    'refresh_token': refresh_token
-                })
-                return Response(response_data)
+                data = {'access_token': access_token, 'code': code}
+                accept = requests.post(
+                    f"{BASE_URL}accounts/kakao/login/finish/",
+                    data=data,
+                )
+
+                accept_status = accept.status_code
+                if accept_status != 200:
+                    return Response({'err_msg': accept.reason}, status=accept_status)
+
+                accept_json = accept.json()
+
+                # refresh_token = accept.headers['Set-Cookie']
+                # refresh_token = refresh_token.replace('=', ';').replace(',', ';').split(';')
+                # print(refresh_token)
+                # token_index = refresh_token.index('refresh_token')
+                # cookie_max_age = 3600 * 24 * 14  # 14 days
+                # refresh_token = refresh_token[token_index + 1]
+                # accept_json.pop("user", None)
+                # response_cookie = Response(accept_json)
+                # response_cookie.set_cookie('refresh_token', refresh_token, max_age=cookie_max_age, httponly=True,
+                #                            samesite='Lax')
+                # return response_cookie
+                #
+                # accept_json.pop('user', None)
+                #
+                # refresh_token = accept.headers['Set-Cookie']
+                # print(refresh_token)
+                return Response(accept_json)
+
 
             except CustomUser.DoesNotExist:
                 # 기존에 가입된 유저가 없으면 새로 가입
-                data = {'access_token': access_token, 'code': code, 'id_token': user_oid}
+                data = {'access_token': access_token, 'code': code}
 
                 accept = requests.post(
                     f"{BASE_URL}accounts/kakao/login/finish/",
@@ -101,7 +125,7 @@ class SocialLoginView(APIView):
 
                 accept_status = accept.status_code
                 if accept_status != 200:
-                    return Response({'err_msg': 'failed to signup'}, status=accept_status)
+                    return Response({'err_msg': f'failed to signup'}, status=accept_status)
 
                 with transaction.atomic():
                     user = CustomUser.objects.create(
@@ -112,21 +136,15 @@ class SocialLoginView(APIView):
                         directNumber=None,
                         status='Pending'
                     )
-
-                serializer = CustomUserSerializer(user)
-                response_data = serializer.data
-                response_data.update({
-                    'access_token': access_token,
-                    'refresh_token': refresh_token
-                })
-
-                return Response(response_data)
+                accept_json = accept.json()
+                accept_json.pop('user', None)
+                return Response(accept_json)
 
         except JSONDecodeError as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class KakaoLogin(SocialLoginView):
-    adapter_class = CustomKakaoOAuth2Adapter
+    adapter_class = kakao_view.KakaoOAuth2Adapter
     client_class = OAuth2Client
     callback_url = KAKAO_CALLBACK_URI
 

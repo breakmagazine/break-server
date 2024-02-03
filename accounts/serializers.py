@@ -20,10 +20,17 @@ class CustomTokenRefreshSerializer(serializers.Serializer):
 
         return data
 
+from dj_rest_auth.registration.serializers import (
+    RegisterSerializer as DefaultRegisterSerializer,
+)
+
+
 class UserRegisterSerializer(DefaultRegisterSerializer):
-    # name = serializers.CharField(max_length=50, write_only=True, required=True)
+    name = serializers.CharField(max_length=50, write_only=True, required=True)
+
     def custom_signup(self, request, user):
         print(self.validated_data)
+        # name = self.validated_data.pop("name")
         # if name:
         #     user.name = name
         #     user.save()
