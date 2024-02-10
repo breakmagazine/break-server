@@ -126,6 +126,7 @@ class KakaoLoginView(SocialLoginView):
     client_class = OAuth2Client
     callback_url = KAKAO_CALLBACK_URI
 
+    @extend_schema(exclude=True)
     def post(self, request, *args, **kwargs):
         return super().post(request, *args, **kwargs)
 
@@ -133,7 +134,7 @@ class KakaoLoginView(SocialLoginView):
 class UpdateUserInfoView(APIView):
     permission_classes = [IsAuthenticated]  # 인증된 사용자만 접근 가능하도록 설정
 
-    @extend_schema(request=UserInfoUpdateSerializer, responses={200: UserInfoUpdateSerializer})
+    @extend_schema(summary="유저 정보 업데이트", request=UserInfoUpdateSerializer, responses={200: UserInfoUpdateSerializer})
     def put(self, request, *args, **kwargs):
         print(request.user)
         user = request.user
@@ -164,6 +165,7 @@ class UpdateUserInfoView(APIView):
 class GetUserInfoView(APIView):
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(summary="유저 정보 반환", request=GetUserInfoSerializer, responses={200: GetUserInfoSerializer})
     def get(self, request):
         user = request.user
 
