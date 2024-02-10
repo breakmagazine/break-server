@@ -10,4 +10,5 @@ urlpatterns = [
         name="kakao_login_todjango",
     ),
     path("join/", views.UpdateUserInfoView.as_view(), name="update_user_info"),
+    path("user/me", views.GetUserInfoView.as_view(), name="get_user_info"),
 ]
