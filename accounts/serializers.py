@@ -23,3 +23,16 @@ class UserLoginSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = "__all__"
+
+
+class UserInfoUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ("username", "position", "direct_number", "profile_image", "status")
+
+
+class GetUserInfoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ("id", "username", "position", "direct_number", "profile_image", "status")
+

@@ -20,7 +20,7 @@ from breakserver.settings import secrets
 from dj_rest_auth.registration.views import SocialLoginView
 from allauth.socialaccount.providers.kakao import views as kakao_view
 from .models import CustomUser
-from .serializers import UserLoginSerializer
+from .serializers import UserLoginSerializer, UserInfoUpdateSerializer, GetUserInfoSerializer
 
 BASE_URL = "http://127.0.0.1:8000/"
 KAKAO_CALLBACK_URI = BASE_URL + "accounts/kakao/callback/"
@@ -50,7 +50,6 @@ def kakao_login(request):
 @permission_classes([AllowAny])
 def kakao_callback(request):
     code = request.GET.get("code")
-    print(code)
 
     # Access Token Request
 
@@ -83,10 +82,10 @@ def kakao_callback(request):
     # 회원가입, 로그인 로직
 
     data = {"access_token": access_token, "code": code}
-    print(data)
 
     try:
         user = CustomUser.objects.get(email=email)
+        print(user)
 
         accept = requests.post(f"{BASE_URL}accounts/kakao/login/finish/", data=data)
         accept_status = accept.status_code
@@ -94,6 +93,7 @@ def kakao_callback(request):
             return Response({"err_msg": "failed to signin"}, status=accept_status)
 
         accept_json = accept.json()
+        print(accept_json['user']['email'])
         accept_json.pop("user", None)
         return Response(accept_json)
 
@@ -133,29 +133,41 @@ class KakaoLoginView(SocialLoginView):
 class UpdateUserInfoView(APIView):
     permission_classes = [IsAuthenticated]  # 인증된 사용자만 접근 가능하도록 설정
 
-    @extend_schema(request=UserLoginSerializer, responses={200: UserLoginSerializer})
+    @extend_schema(request=UserInfoUpdateSerializer, responses={200: UserInfoUpdateSerializer})
     def put(self, request, *args, **kwargs):
+        print(request.user)
         user = request.user
 
         # 유저 데이터 가져옴
-        nickname = request.data.get("nickname")
-        profile_image = request.data.get("profileImage")
-        position = request.data.get("position")
-        direct_number = request.data.get("directNumber")
-        status = request.data.get("status")
+        new_username = request.data.get("username")
+        new_profile_image = request.data.get("profile_image")
+        new_position = request.data.get("position")
+        new_direct_number = request.data.get("direct_number")
+        new_status = request.data.get("status")
 
         # 유저 데이터 비교
-        user.username = nickname if nickname is not None else user.username
-        user.profileImage = (
-            profile_image if profile_image is not None else user.profileImage
+        user.username = new_username if new_username is not None else user.username
+        user.profile_image = (
+            new_profile_image if new_profile_image is not None else user.profile_image
         )
-        user.position = position if position is not None else user.position
-        user.directNumber = (
-            direct_number if direct_number is not None else user.directNumber
+        user.position = new_position if new_position is not None else user.position
+        user.direct_number = (
+            new_direct_number if new_direct_number is not None else user.direct_number
         )
-        user.status = status if status is not None else user.status
+        user.status = new_status if new_status is not None else user.status
         user.save()
 
         # 업데이트된 사용자 정보를 반환
-        serializer = UserLoginSerializer(user)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        serializer = UserInfoUpdateSerializer(user)
+        return Response(serializer.data)
+
+class GetUserInfoView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+
+        serializer = GetUserInfoSerializer(user)
+        print(serializer.data)
+
+        return Response(serializer.data)

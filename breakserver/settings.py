@@ -83,8 +83,8 @@ REST_FRAMEWORK = {
 REST_AUTH = {
     "USE_JWT": True,
     "JWT_AUTH_COOKIE": "jwt-auth",
-    "REGISTER_SERIALIZER": "accounts.serializers.UserLoginSerializer",
-    "SESSION_LOGIN": False,
+    "REGISTER_SERIALIZER": "accounts.serializers.UserRegisterSerializer",
+    'JWT_AUTH_HTTPONLY': False,
 }
 
 # JWT

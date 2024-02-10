@@ -1,6 +1,5 @@
 from django.contrib import admin
-from django.urls import include, path, re_path
-from .views import kakao_login_page, UserRegisterAPIView, UserLoginAPIView
+from django.urls import include, path
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from rest_framework import permissions
@@ -10,6 +9,8 @@ from drf_spectacular.views import (
     SpectacularRedocView,
     SpectacularSwaggerView,
 )
+
+from breakserver.views import kakao_login_page
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -36,14 +37,16 @@ urlpatterns = [
     path("", kakao_login_page, name="home"),
     path("admin/", admin.site.urls),
     # 로그인 관련
-    path("accounts/", include("dj_rest_auth.urls")),
-    path("accounts/", include("dj_rest_auth.registration.urls")),
+    # path("accounts/", include("dj_rest_auth.urls")),
+    # path("accounts/", include("dj_rest_auth.registration.urls")),
     # path('allauth/', include('allauth.urls')),
     path("accounts/", include("accounts.urls")),
     path(
         "accounts/social/",
         include("allauth.socialaccount.urls"),
     ),
+    path("registration/", include("dj_rest_auth.registration.urls")),
+
     # swagger 관련
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     path(
