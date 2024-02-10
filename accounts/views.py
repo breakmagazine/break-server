@@ -50,7 +50,6 @@ def kakao_login(request):
 @permission_classes([AllowAny])
 def kakao_callback(request):
     code = request.GET.get("code")
-    print(code)
 
     # Access Token Request
 
@@ -94,6 +93,7 @@ def kakao_callback(request):
             return Response({"err_msg": "failed to signin"}, status=accept_status)
 
         accept_json = accept.json()
+        print(accept_json['user']['email'])
         accept_json.pop("user", None)
         return Response(accept_json)
 
@@ -133,7 +133,7 @@ class KakaoLoginView(SocialLoginView):
 class UpdateUserInfoView(APIView):
     permission_classes = [IsAuthenticated]  # 인증된 사용자만 접근 가능하도록 설정
 
-    # @extend_schema(request=UserInfoUpdateSerializer, responses={200: UserInfoUpdateSerializer})
+    @extend_schema(request=UserInfoUpdateSerializer, responses={200: UserInfoUpdateSerializer})
     def put(self, request, *args, **kwargs):
         print(request.user)
         user = request.user
