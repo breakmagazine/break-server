@@ -41,7 +41,6 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     objects = CustomUserManager()
 
     def save(self, *args, **kwargs):
-        self.status = self.STATUS_PENDING
 
         super().save(*args, **kwargs)
 
