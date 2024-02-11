@@ -2,7 +2,7 @@ import json
 import os
 import sys
 from pathlib import Path
-import local_settings
+from breakserver import local_settings
 from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
