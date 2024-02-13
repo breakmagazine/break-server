@@ -2,29 +2,21 @@ import json
 import os
 import sys
 from pathlib import Path
-from breakserver import local_settings
 from datetime import timedelta
+import environ
+import importlib.util
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+env = environ.Env(
+    DEBUG=(bool, False)
+)
+environ.Env.read_env()
 
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+PARENT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
-
-SECRET_BASE_FILE = os.path.join(BASE_DIR, "secrets.json")
-secrets = json.loads(open(SECRET_BASE_FILE).read())
-for key, value in secrets.items():
-    setattr(sys.modules[__name__], key, value)
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = local_settings.SECRET_KEY
-
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
-
 
 # Application definition
 INSTALLED_APPS = [
@@ -65,7 +57,6 @@ MIDDLEWARE = [
 ]
 
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None  # 커스텀한 user model엔 name field가 있다.
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
@@ -88,15 +79,14 @@ REST_AUTH = {
 }
 
 # JWT
-
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
-    "ROTATE_REFRESH_TOKENS": True,  # True로 설정할 경우, refresh token을 보내면 새로운 access token과 refresh token이 반환된다.
-    "BLACKLIST_AFTER_ROTATION": True,  # True로 설정될 경우, 기존에 있던 refresh token은 blacklist가된다
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
     "UPDATE_LAST_LOGIN": True,
     "ALGORITHM": "HS256",
-    "SIGNING_KEY": SECRET_KEY,
+    "SIGNING_KEY": env("DJANGO_SECRET_KEY"),
     "VERIFYING_KEY": None,
     "AUDIENCE": None,
     "ISSUER": None,
@@ -119,7 +109,6 @@ SIMPLE_JWT = {
 ##CORS
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
-
 CORS_ALLOW_METHODS = (
     "DELETE",
     "GET",
@@ -128,7 +117,6 @@ CORS_ALLOW_METHODS = (
     "POST",
     "PUT",
 )
-
 CORS_ALLOW_HEADERS = (
     "accept",
     "accept-encoding",
@@ -148,7 +136,7 @@ SPECTACULAR_SETTINGS = {
             "BearerAuth": {
                 "type": "http",
                 "scheme": "bearer",
-                "bearerFormat": "JWT",  # JWT는 선택적으로 추가할 수 있습니다.
+                "bearerFormat": "JWT",
             }
         }
     },
@@ -173,16 +161,22 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "breakserver.wsgi.application"
-
+WSGI_APPLICATION = 'breakserver.wsgi.application'
 
 # Database
-# https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DATABASES = local_settings.DATABASES
+DATABASES = {
+    'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': env("DB_NAME"),
+            'USER': env("DB_USER"),
+            'PASSWORD': env("DB_PASSWORD"),
+            'HOST': env("DB_HOST"),
+            'PORT': env("DB_PORT"),
+    }
+}
 
 # Password validation
-# https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -225,3 +219,5 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+SECRET_KEY = env("DJANGO_SECRET_KEY")
