@@ -161,7 +161,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'break-server.breakserver.wsgi.application'
+WSGI_APPLICATION = 'breakserver.wsgi.application'
 
 # Database
 
