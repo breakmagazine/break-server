@@ -1,32 +1,30 @@
-from urllib.request import Request
-
+import environ
+from pathlib import Path
 from django.db import transaction
 from drf_spectacular.utils import extend_schema, OpenApiResponse
 
 import requests
-from django.shortcuts import redirect, get_object_or_404
-from django.conf import settings
+from django.shortcuts import redirect
 from json.decoder import JSONDecodeError
-from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
-
-from breakserver.settings import secrets
-
 from dj_rest_auth.registration.views import SocialLoginView
 from allauth.socialaccount.providers.kakao import views as kakao_view
 from .models import CustomUser
-from .serializers import UserLoginSerializer, UserInfoUpdateSerializer, GetUserInfoSerializer
+from .serializers import UserInfoUpdateSerializer, GetUserInfoSerializer
 
-BASE_URL = "http://127.0.0.1:8000/"
+env_file_path = Path(__file__).resolve().parent.parent / 'breakserver' / 'settings' / '.env'
+env = environ.Env()
+environ.Env.read_env(env_file_path)
+
+BASE_URL = env("BASE_URL")
 KAKAO_CALLBACK_URI = BASE_URL + "accounts/kakao/callback/"
-REST_API_KEY = getattr(settings, "KAKAO_REST_API_KEY")
-CLIENT_SECRET = secrets["SECRET_KEY"]
-
+REST_API_KEY = env("KAKAO_REST_API_KEY")
+CLIENT_SECRET = env("KAKAO_CLIENT_SECRET_KEY")
 
 @extend_schema(
     summary="카카오 로그인",
