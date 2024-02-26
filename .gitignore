@@ -6,7 +6,7 @@
 *.pot
 *.pyc
 __pycache__/
-local_settings.py
+#development.py
 db.sqlite3
 db.sqlite3-journal
 media
@@ -132,7 +132,7 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-.env
+breakserver/settings/.env
 .venv
 env/
 venv/
@@ -172,6 +172,4 @@ cython_debug/
 .idea/
 
 # End of https://www.toptal.com/developers/gitignore/api/django
-
-secrets.json
 .DS_Store

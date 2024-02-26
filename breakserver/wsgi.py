@@ -1,16 +1,12 @@
-"""
-WSGI config for breakserver project.
-
-It exposes the WSGI callable as a module-level variable named ``application``.
-
-For more information on this file, see
-https://docs.djangoproject.com/en/4.2/howto/deployment/wsgi/
-"""
-
-import os
-
+import os, sys
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "breakserver.settings")
+# project_path = '/Users/jang-youngjoon/dev-projects/break-server'
+project_path = '/home/ubuntu/docker-server/break-server'
+
+sys.path.append(project_path)
+sys.path.append(os.path.join(project_path, 'venv/lib/python3.9/site-packages'))
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "breakserver.settings.production")
 
 application = get_wsgi_application()
