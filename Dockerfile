@@ -1,11 +1,12 @@
 FROM python:3.9.12
-
 ENV PYTHONUNBUFFERED 1
 
 RUN apt-get update && apt-get install -y vim && apt-get clean
 
-WORKDIR /break-server/
-ADD . /break-server/
+RUN mkdir /srv/docker-server
+ADD . /srv/docker-server
+
+WORKDIR /srv/docker-server
 
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
