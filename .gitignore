@@ -6,7 +6,7 @@
 *.pot
 *.pyc
 __pycache__/
-#development.py
+#dev.py
 db.sqlite3
 db.sqlite3-journal
 media
@@ -173,3 +173,5 @@ cython_debug/
 
 # End of https://www.toptal.com/developers/gitignore/api/django
 .DS_Store
+
+staticfiles

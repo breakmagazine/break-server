@@ -1,15 +1,19 @@
-FROM python:3.9.12
+FROM python:3.10.0-alpine
 ENV PYTHONUNBUFFERED 1
 
-RUN apt-get update && apt-get install -y vim && apt-get clean
+RUN mkdir /app
+WORKDIR /app
 
-RUN mkdir /srv/docker-server
-ADD . /srv/docker-server
+# dependencies for psycopg2-binary
+RUN apk add --no-cache mariadb-connector-c-dev libffi-dev gcc musl-dev
+RUN apk update && apk add python3 python3-dev mariadb-dev build-base && pip install mysqlclient
 
-WORKDIR /srv/docker-server
-
+# By copying over requirements first, we make sure that Docker will cache
+# our installed requirements rather than reinstall them on every build
+COPY requirements.txt /app/requirements.txt
 RUN pip install --upgrade pip
+RUN pip install --upgrade pip setuptools wheel
 RUN pip install -r requirements.txt
 
-EXPOSE 8000
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+# Now copy in our code, and run it
+COPY . /app/
