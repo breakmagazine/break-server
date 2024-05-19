@@ -4,7 +4,9 @@ import sys
 from pathlib import Path
 from datetime import timedelta
 import environ
-import importlib.util
+import pymysql
+
+pymysql.install_as_MySQLdb()
 
 env = environ.Env(DEBUG=(bool, False))
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
