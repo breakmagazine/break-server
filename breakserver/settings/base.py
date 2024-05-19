@@ -4,15 +4,13 @@ import sys
 from pathlib import Path
 from datetime import timedelta
 import environ
-import importlib.util
+import pymysql
 
-env = environ.Env(
-    DEBUG=(bool, False)
-)
-environ.Env.read_env()
+pymysql.install_as_MySQLdb()
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-PARENT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+env = environ.Env(DEBUG=(bool, False))
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 
 DEBUG = True
 
@@ -167,12 +165,12 @@ WSGI_APPLICATION = 'breakserver.wsgi.application'
 
 DATABASES = {
     'default': {
-            'ENGINE': 'django.db.backends.mysql',
-            'NAME': env("DB_NAME"),
-            'USER': env("DB_USER"),
-            'PASSWORD': env("DB_PASSWORD"),
-            'HOST': env("DB_HOST"),
-            'PORT': env("DB_PORT"),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': env("DB_NAME"),
+        'USER': env("DB_USER"),
+        'PASSWORD': env("DB_PASSWORD"),
+        'HOST': env("DB_HOST"),
+        'PORT': env("DB_PORT"),
     }
 }
 

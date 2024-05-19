@@ -1,0 +1,36 @@
+version: '3'
+services:
+
+  breakdb:
+    container_name: breakdb
+    image: mariadb:latest
+    restart: always
+    expose:
+      - 3306
+    ports:
+      - '3307:3306'
+    env_file:
+      - .env
+    volumes:
+      - dbdata:/var/lib/mysql
+
+  breakweb:
+    container_name: breakweb
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    command: sh -c "python manage.py makemigrations && python manage.py migrate && python manage.py runserver 0.0.0.0:8000 --settings=breakserver.settings.dev"
+    environment:
+      DJANGO_ENV: development
+    env_file:
+      - .env
+    restart: always
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    depends_on:
+      - breakdb
+volumes:
+  app:
+  dbdata:
