@@ -1,10 +1,20 @@
 from .base import *
 
+env = environ.Env(DEBUG=(bool, False))
+
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+
+environ.Env.read_env(os.path.join(BASE_DIR, ".env.prod"))
+
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": env("DB_NAME"),
+        "USER": env("DB_USER"),
+        "PASSWORD": env("DB_PASSWORD"),
+        "HOST": env("DB_HOST"),
+        "PORT": env("DB_PORT"),
+    }
+}
+
 DEBUG = False
-
-ALLOWED_HOSTS = ['http://3.36.128.9/', 'http://172.31.33.251/', 'http://127.0.0.1:8000/']
-
-# 프로덕션 환경에 적합한 추가 보안 설정
-SECURE_SSL_REDIRECT = True
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
