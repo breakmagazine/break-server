@@ -25,7 +25,7 @@ RUN pip install --upgrade pip && pip wheel --no-cache-dir --no-deps --wheel-dir 
 #########
 
 # pull official base image
-FROM python:3.9.0-alpine
+FROM python:3.10.0-alpine
 
 # create directory for the app user
 RUN mkdir -p /home/app
