@@ -1,5 +1,19 @@
 from django.db import models
+from django.conf import settings
 
-# Create your models here.
+
 class Article(models.Model):
-    image_url = models.URLField()
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    thumbnail = models.URLField()
+    category = models.CharField(max_length=50)
+    sub_category = models.CharField(max_length=50, null=True, blank=True)
+    magazine_number = models.IntegerField()
+    collaborators = models.JSONField()
+    title = models.CharField(max_length=255)
+    content = models.TextField()
+    look_info = models.JSONField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.title

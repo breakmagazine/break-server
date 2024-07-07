@@ -10,6 +10,7 @@ from drf_spectacular.views import (
     SpectacularSwaggerView,
 )
 
+from articles.views import ArticleCreateView
 from breakserver.views import kakao_login_page
 
 schema_view = get_schema_view(
@@ -59,4 +60,5 @@ urlpatterns = [
         SpectacularRedocView.as_view(url_name="schema"),
         name="redoc",
     ),
+    path("articles/", include("articles.urls"))
 ]
