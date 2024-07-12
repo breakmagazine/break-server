@@ -6,7 +6,7 @@ class Article(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     thumbnail = models.URLField()
     category = models.CharField(max_length=50)
-    sub_category = models.CharField(max_length=50, null=True, blank=True)
+    sub_category = models.CharField(max_length=50, null=True, blank=True) # ㅊㅁㅅ
     magazine_number = models.IntegerField()
     collaborators = models.JSONField()
     title = models.CharField(max_length=255)

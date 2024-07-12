@@ -6,3 +6,8 @@ class ArticleSerializer(serializers.ModelSerializer):
         model = Article
         fields = '__all__'
         read_only_fields = ('user',)
+
+class ArticleDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Article
+        exclude = ('user',)
