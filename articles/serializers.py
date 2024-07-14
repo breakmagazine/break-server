@@ -1,13 +1,15 @@
 from rest_framework import serializers
 from .models import Article
 
+
 class ArticleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Article
-        fields = '__all__'
-        read_only_fields = ('user',)
+        fields = "__all__"
+        read_only_fields = ("user",)
+
 
 class ArticleDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Article
-        exclude = ('user',)
+        exclude = ("user",)

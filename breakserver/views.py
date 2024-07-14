@@ -8,15 +8,19 @@ def kakao_login_page(request):
 
 
 def get_presigned_url(request):
-    if request.method == 'GET':
-        bucket_name = 'breakmagazine_image'
-        object_name = request.GET.get('object_name')  # 예: 'articles/thumbnails/your-image.jpg'
+    if request.method == "GET":
+        bucket_name = "breakmagazine_image"
+        object_name = request.GET.get(
+            "object_name"
+        )  # 예: 'articles/thumbnails/your-image.jpg'
 
         if not object_name:
-            return JsonResponse({'error': 'Object name is required'}, status=400)
+            return JsonResponse({"error": "Object name is required"}, status=400)
 
         response = create_presigned_post(bucket_name, object_name)
         if response:
             return JsonResponse(response)
         else:
-            return JsonResponse({'error': 'Could not generate presigned URL'}, status=500)
+            return JsonResponse(
+                {"error": "Could not generate presigned URL"}, status=500
+            )

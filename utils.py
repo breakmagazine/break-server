@@ -11,8 +11,10 @@ BASE_DIR = Path(__file__).resolve().parent
 environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 
 
-def create_presigned_post(bucket_name, object_name, fields=None, conditions=None, expiration=3600):
-    """ 파일을 업로드하기 위한 사전인증 URL S3 POST 요청 생성하기
+def create_presigned_post(
+    bucket_name, object_name, fields=None, conditions=None, expiration=3600
+):
+    """파일을 업로드하기 위한 사전인증 URL S3 POST 요청 생성하기
 
     :param bucket_name: 문자열
     :param object_name: 문자열
@@ -38,7 +40,7 @@ def create_presigned_post(bucket_name, object_name, fields=None, conditions=None
             Key=object_name,
             Fields=fields,
             Conditions=conditions,
-            ExpiresIn=expiration
+            ExpiresIn=expiration,
         )
     except ClientError as e:
         logging.error(e)
