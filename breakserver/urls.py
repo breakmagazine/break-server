@@ -37,7 +37,7 @@ def preprocessing_filter_spec(endpoints):
 urlpatterns = [
     path("", kakao_login_page, name="home"),
     path("admin/", admin.site.urls),
-    path("PRESIGNED_URL/", get_presigned_url, name="get_presigned_url"),
+    path("presigned_url/", get_presigned_url, name="get_presigned_url"),
     path("accounts/", include("accounts.urls")),
     path("articles/", include("articles.urls")),
     # swagger 관련
