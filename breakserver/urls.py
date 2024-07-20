@@ -10,7 +10,8 @@ from drf_spectacular.views import (
     SpectacularSwaggerView,
 )
 
-from breakserver.views import kakao_login_page
+from articles.views import ArticleCreateView
+from breakserver.views import kakao_login_page, get_presigned_url
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -36,17 +37,9 @@ def preprocessing_filter_spec(endpoints):
 urlpatterns = [
     path("", kakao_login_page, name="home"),
     path("admin/", admin.site.urls),
-    # 로그인 관련
-    # path("accounts/", include("dj_rest_auth.urls")),
-    # path("accounts/", include("dj_rest_auth.registration.urls")),
-    # path('allauth/', include('allauth.urls')),
+    path("presigned_url/", get_presigned_url, name="get_presigned_url"),
     path("accounts/", include("accounts.urls")),
-    path(
-        "accounts/social/",
-        include("allauth.socialaccount.urls"),
-    ),
-    path("registration/", include("dj_rest_auth.registration.urls")),
-
+    path("articles/", include("articles.urls")),
     # swagger 관련
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     path(

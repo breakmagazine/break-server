@@ -14,7 +14,7 @@ environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ["*"]
 
 # Application definition
 INSTALLED_APPS = [
@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     # myapp
     "breakserver",
     "accounts",
+    "articles",
     # django-rest-auth
     "rest_framework",
     "rest_framework_simplejwt",
@@ -74,7 +75,7 @@ REST_AUTH = {
     "USE_JWT": True,
     "JWT_AUTH_COOKIE": "jwt-auth",
     "REGISTER_SERIALIZER": "accounts.serializers.UserRegisterSerializer",
-    'JWT_AUTH_HTTPONLY': False,
+    "JWT_AUTH_HTTPONLY": False,
 }
 
 # JWT
@@ -160,18 +161,18 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'breakserver.wsgi.application'
+WSGI_APPLICATION = "breakserver.wsgi.application"
 
 # Database
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': env("DB_NAME"),
-        'USER': env("DB_USER"),
-        'PASSWORD': env("DB_PASSWORD"),
-        'HOST': env("DB_HOST"),
-        'PORT': env("DB_PORT"),
+    "default": {
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": env("DB_NAME"),
+        "USER": env("DB_USER"),
+        "PASSWORD": env("DB_PASSWORD"),
+        "HOST": env("DB_HOST"),
+        "PORT": env("DB_PORT"),
     }
 }
 
