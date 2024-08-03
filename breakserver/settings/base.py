@@ -29,6 +29,11 @@ INSTALLED_APPS = [
     "breakserver",
     "accounts",
     "articles",
+    "banners",
+    "histories",
+    "symbolics",
+    "main_articles",
+    "category_images",
     # django-rest-auth
     "rest_framework",
     "rest_framework_simplejwt",
