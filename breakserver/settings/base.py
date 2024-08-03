@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     "articles",
     "banners",
     "histories",
+    "symbolics",
     # django-rest-auth
     "rest_framework",
     "rest_framework_simplejwt",
