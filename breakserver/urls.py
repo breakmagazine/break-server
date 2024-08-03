@@ -44,6 +44,7 @@ urlpatterns = [
     path("symbolic/", include("symbolics.urls")),
     path("main_articles/", include("main_articles.urls")),
     path("category_images/", include("category_images.urls")),
+    path("histories/", include("histories.urls")),
     # swagger 관련
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     path(
