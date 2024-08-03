@@ -40,6 +40,7 @@ urlpatterns = [
     path("presigned_url/", get_presigned_url, name="get_presigned_url"),
     path("accounts/", include("accounts.urls")),
     path("articles/", include("articles.urls")),
+    path("banners/", include("banners.urls")),
     # swagger 관련
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     path(
