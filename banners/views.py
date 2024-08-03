@@ -31,7 +31,7 @@ class MainBannerView(APIView):
         except MainBanner.DoesNotExist:
             banner = MainBanner(pk=1)
 
-        serializer = MainBannerSerializer(banner, data=request.data)
+        serializer = MainBannerSerializer(banner, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
@@ -63,7 +63,7 @@ class CentralBannerView(APIView):
         except CentralBanner.DoesNotExist:
             banner = CentralBanner(pk=1)
 
-        serializer = CentralBannerSerializer(banner, data=request.data)
+        serializer = CentralBannerSerializer(banner, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)

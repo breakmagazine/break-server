@@ -31,7 +31,7 @@ class SymbolicView(APIView):
         except Symbolic.DoesNotExist:
             symbolic = Symbolic(pk=1)
 
-        serializer = SymbolicSerializer(symbolic, data=request.data)
+        serializer = SymbolicSerializer(symbolic, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
