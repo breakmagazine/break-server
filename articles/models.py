@@ -6,8 +6,9 @@ class Article(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     thumbnail_image = models.URLField()
     category = models.CharField(max_length=50)
-    sub_category = models.CharField(max_length=50, null=True, blank=True)  # ㅊㅁㅅ
+    sub_category = models.CharField(max_length=50, null=True, blank=True)  # FASION 인 경우만 subcategory 존재
     magazine_number = models.IntegerField()
+    author = models.CharField(max_length=50, null=True)
     collaborators = models.JSONField()
     title = models.CharField(max_length=255)
     content = models.TextField()
