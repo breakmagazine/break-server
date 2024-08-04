@@ -7,7 +7,11 @@ from rest_framework import status
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
-
+@extend_schema(
+    summary="기사 작성",
+    description="기사를 작성합니다.",
+    request=ArticleSerializer
+)
 class ArticleCreateView(generics.CreateAPIView):
     queryset = Article.objects.all()
     serializer_class = ArticleSerializer
